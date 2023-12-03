@@ -13,8 +13,14 @@ ARG MG_USER_ID=10500
 RUN mkdir /tmp/tomcat static
 RUN chmod -R 777 /tmp
 RUN chmod -R 777 /usr/app/choreotest/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar
-RUN adduser -S -u ${MG_USER_ID} ${MG_USER} -G root
-USER 10500
+# Ensure the 'root' group exists
+RUN getent group root || addgroup -g 0 root
+
+# Add a non-root user if it doesn't exist
+RUN id -u $MG_USER || useradd -u $MG_USER_ID -g root -m -d /home/$MG_USER -s /bin/bash $MG_USER
+
+# Set a non-root user
+USER $MG_USER_ID
 
 ENTRYPOINT ["java","-jar","/usr/app/choreotest/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar"]
 RUN echo `ls`
