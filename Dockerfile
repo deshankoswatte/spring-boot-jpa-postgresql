@@ -1,11 +1,10 @@
-FROM openjdk:17-slim-bullseye AS build
-RUN apt-get update && apt-get install -y maven
+FROM maven:3.6.0-jdk-11-slim AS build
 COPY src /usr/app/src
 COPY pom.xml /usr/app
 RUN mvn -f /usr/app/pom.xml clean package -Dmaven.test.skip=true
 
 # Package stage
-FROM openjdk:17-slim-bullseye
+FROM adoptopenjdk/openjdk11:jdk-11.0.16.1_1-alpine
 COPY --from=build /usr/app/target/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar /usr/app/choreotest/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar
 
 ARG MG_USER=wso2
@@ -13,14 +12,8 @@ ARG MG_USER_ID=10500
 RUN mkdir /tmp/tomcat static
 RUN chmod -R 777 /tmp
 RUN chmod -R 777 /usr/app/choreotest/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar
-# Ensure the 'root' group exists
-RUN getent group root || addgroup -g 0 root
-
-# Add a non-root user if it doesn't exist
-RUN id -u $MG_USER || useradd -u $MG_USER_ID -g root -m -d /home/$MG_USER -s /bin/bash $MG_USER
-
-# Set a non-root user
-USER $MG_USER_ID
+RUN adduser -S -u ${MG_USER_ID} ${MG_USER} -G root
+USER 10500
 
 ENTRYPOINT ["java","-jar","/usr/app/choreotest/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar"]
 RUN echo `ls`
