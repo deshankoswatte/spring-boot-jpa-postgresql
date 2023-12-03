@@ -1,4 +1,5 @@
 FROM eclipse-temurin:17-jdk-jammy AS build
+RUN apt-get update && apt-get install -y maven
 COPY src /usr/app/src
 COPY pom.xml /usr/app
 RUN mvn -f /usr/app/pom.xml clean package -Dmaven.test.skip=true
