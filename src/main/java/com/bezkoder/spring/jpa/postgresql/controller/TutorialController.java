@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bezkoder.spring.jpa.postgresql.model.Tutorial;
 import com.bezkoder.spring.jpa.postgresql.repository.TutorialRepository;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = {"http://localhost:8081", "https://84611715-6383-41eb-8c30-7784affa888d.e1-us-east-azure.choreoapps.dev"})
 @RestController
 @RequestMapping("/api")
 public class TutorialController {
